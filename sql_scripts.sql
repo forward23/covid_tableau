@@ -87,3 +87,37 @@ sum(new_vaccinations) over (partition by "location" order by date) /population a
 from covid c
 where continent is not null
 order by "location", "date"
+
+
+--Tableau visualisation
+
+--table1: total cases vs total deaths
+select SUM(new_cases) as total_new_cases, SUM(new_deaths) as total_new_deaths, SUM(new_deaths) / SUM(new_cases) as death_per_cases
+from covid
+where continent is not null
+
+
+--table2: Total Deaths by continent
+select "location", SUM(new_deaths) as total_deaths
+from covid
+where continent is null
+and "location" not in ('World', 'European Union', 'International')
+group by 1
+order by 2 desc
+
+
+--table3: Percent population infected
+select "location", population, coalesce (max(total_cases),0) as highest_total_case,
+coalesce(max((total_cases)/population ),0) as percent_population_infected
+from covid c
+where continent is not null
+group by 1,2
+order by 4 desc
+
+
+--table4:
+select "location", population, date("date"), coalesce (total_cases,0) as total_cases,
+coalesce (total_cases /population,0) as cases_per_population
+from covid
+where continent is not null
+order by 1,3
